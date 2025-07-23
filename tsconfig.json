@@ -19,7 +19,12 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"], // This maps "@" to your project root
+      // Ensure these are correctly setup, especially the new one for "auth"
+      "@/auth/*": ["./auth/*"], // Add or confirm this line!
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"]
+      // ... and any other aliases for player/, etc. in future phases
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
