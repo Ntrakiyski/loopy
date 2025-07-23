@@ -1,12 +1,3 @@
-Of course. A great project deserves a great README. This file is crucial for you to remember how to set it up in the future and for anyone else who might see the project.
-
-Here is a comprehensive, professional README file tailored specifically to your project.
-
-**Action:**
-Copy the entire content below and paste it into the `README.md` file at the root of your project.
-
----
-
 # Spotify Segment Looper
 
 A web application that allows users to select any Spotify track, define a precise start and end time (down to the millisecond), and listen to that segment loop seamlessly and indefinitely. Built with Next.js, the Spotify Web Playback SDK, and a modern UI powered by Shadcn UI.
