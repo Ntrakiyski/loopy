@@ -43,8 +43,8 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 2.  **Clone the Repository:**
     ```bash
-    git clone https://github.com/your_username/spotify-segment-looper.git
-    cd spotify-segment-looper
+    git clone https://github.com/Ntrakiyski/loopy.git
+    cd loopy
     ```
 
 3.  **Install Dependencies:**
