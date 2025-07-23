@@ -1,6 +1,4 @@
-// player/use-loop.ts
-
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export interface LoopConfig {
   startMs: number;
@@ -15,12 +13,28 @@ export function useLoop(
   config?: Omit<LoopConfig, 'fadeInCurve' | 'fadeOutCurve'>,
 ) {
   const animationFrameId = useRef<number | null>(null);
+  const intervalId = useRef<NodeJS.Timeout | null>(null);
   const isTransitioning = useRef(false);
+  const [isTabVisible, setIsTabVisible] = useState(true);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsTabVisible(document.visibilityState === 'visible');
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   useEffect(() => {
     const cleanup = () => {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
+      }
+      if (intervalId.current) {
+        clearInterval(intervalId.current);
       }
       isTransitioning.current = false;
     };
@@ -39,9 +53,6 @@ export function useLoop(
         const elapsedTime = currentTime - startTime;
         const progress = Math.min(elapsedTime / fadeMs, 1);
 
-        // THIS IS THE FIX:
-        // The previous math was `1 - Math.abs(...)`, creating a 0->1->0 curve.
-        // The correct math for a 1->0->1 dip is just `Math.abs(...)`.
         const volume = Math.abs(1 - (2 * progress));
         
         player.setVolume(Math.max(0, Math.min(1, volume)));
@@ -64,18 +75,29 @@ export function useLoop(
         playbackState.position >= endMs
       ) {
         isTransitioning.current = true;
-
         player.seek(startMs).then(() => {
           seamlessTransition();
         });
       }
+    };
 
-      if (!isTransitioning.current) {
-        animationFrameId.current = requestAnimationFrame(loopCheck);
+    const startLoopChecker = () => {
+      if (isTabVisible) {
+        // Use requestAnimationFrame when tab is visible
+        const check = () => {
+          loopCheck();
+          if (!isTransitioning.current) {
+            animationFrameId.current = requestAnimationFrame(check);
+          }
+        };
+        animationFrameId.current = requestAnimationFrame(check);
+      } else {
+        // Use setInterval when tab is hidden
+        intervalId.current = setInterval(loopCheck, 100);
       }
     };
 
-    animationFrameId.current = requestAnimationFrame(loopCheck);
+    startLoopChecker();
 
     return cleanup;
   }, [player, playbackState, isActive, config]);
